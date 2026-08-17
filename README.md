@@ -41,6 +41,32 @@ pnpm add typlete
 
 `source` is Typst math by default. Typlete wraps math input in Typst math delimiters and escapes delimiter-breaking characters (`$` and `#`) before compiling. Do not include outer `$...$`; pass the formula body.
 
+## CSS color inheritance
+
+The implicit foreground of inline SVG rendered by Typlete inherits the surrounding CSS `color`, just like normal text.
+
+```svelte
+<p class="secondary">
+	Energy: <TypstInline source="E = m c^2" />
+</p>
+
+<style>
+	.secondary {
+		color: var(--text-secondary);
+	}
+</style>
+```
+
+This also follows normal CSS state changes such as `:hover`, disabled states, theme classes, and inherited custom properties. No formula-specific color prop is required.
+
+Explicit Typst text colors still take precedence and are preserved in the generated SVG:
+
+```svelte
+<TypstInline source="alpha + beta" preamble="#set text(fill: red)" />
+```
+
+Color inheritance applies when the SVG is embedded inline, including the Svelte components, the server helper when its SVG is inserted inline, and Markdown `output: 'html'`. SVG used as an external image (`output: 'markdown-image'`, `output: 'asset'`, or a normal `<img>`) cannot inherit `color` from the surrounding HTML document.
+
 ## Raw Typst
 
 Use `inputMode="raw"` for full Typst markup fragments that should not be wrapped as math. Raw mode passes the source to Typst unchanged, so user-controlled raw input needs separate policy around allowed Typst features and assets.
@@ -329,5 +355,6 @@ const sanitize = await createServerDomPurifySvgSanitizer();
 - Component SSR depends on Svelte experimental async rendering.
 - Plain `typst` fences are never render instructions; use `typlete-typst`, `typlete-raw`, or `typlete-math` when Markdown should render Typst.
 - Math mode and `typlete-math` escape `$` and `#` before wrapping the source in Typst math delimiters. Raw mode and `preamble` are passed to Typst unchanged.
+- CSS text-color inheritance requires inline SVG. SVG loaded through `<img>`, including `markdown-image` and `asset` Markdown output, does not inherit the parent document's `color`.
 - Server rendering temporarily guards Typst runtime fetches so SvelteKit does not track external runtime fetches during SSR.
 - `html`, `markdown-image`, and `asset` output modes pre-render SVG immediately and are not reactive on the client.

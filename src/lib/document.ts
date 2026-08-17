@@ -4,6 +4,7 @@ import {
 	type TypstMode,
 	type TypstResolvedRendererOptions
 } from './config.ts';
+import { TYPLETE_INHERITED_TEXT_COLOR } from './svg.ts';
 
 export interface TypstDocumentRequest extends TypstResolvedRendererOptions {
 	source: string;
@@ -14,7 +15,7 @@ export interface TypstDocumentRequest extends TypstResolvedRendererOptions {
 export function createTypstDocument(options: TypstDocumentRequest): string {
 	const setup = [
 		`#set page(width: auto, height: auto, margin: ${options.pageMargin}, fill: none)`,
-		`#set text(size: ${options.textSize})`
+		`#set text(size: ${options.textSize}, fill: rgb("${TYPLETE_INHERITED_TEXT_COLOR}"))`
 	];
 
 	if (options.mode === 'inline') {

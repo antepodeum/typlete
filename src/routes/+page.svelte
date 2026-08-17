@@ -89,6 +89,28 @@
 <TypstBlock source="${blockSource}" textSize="${textSize}" />
 <TypstBlock source="${rawSource}" inputMode="raw" textSize="${textSize}" />`}</pre>
 	</section>
+
+	<section class="card color-demo">
+		<div class="card-heading">
+			<h2>CSS color inheritance</h2>
+			<p class="color-sample">
+				The formula <TypstInline source="E = m c^2" {textSize} /> inherits this sentence's
+				<code>color</code> automatically.
+			</p>
+			<p>
+				Explicit Typst colors still win:
+				<TypstInline source="alpha + beta" preamble="#set text(fill: red)" {textSize} />
+			</p>
+		</div>
+
+		<pre>{`.secondary {
+  color: var(--text-secondary);
+}
+
+<p class="secondary">
+  Energy: <TypstInline source="E = m c^2" />
+</p>`}</pre>
+	</section>
 </main>
 
 <style>
@@ -168,6 +190,14 @@
 
 	.compact {
 		gap: 14px;
+	}
+
+	.color-demo {
+		--demo-formula-color: #7655b8;
+	}
+
+	.color-sample {
+		color: var(--demo-formula-color);
 	}
 
 	.card-heading p {

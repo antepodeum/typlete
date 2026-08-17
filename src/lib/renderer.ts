@@ -1,7 +1,7 @@
 import type { TypstInputMode, TypstMode, TypstResolvedRendererOptions } from './config.ts';
 import { createTypstDocument } from './document.ts';
 import { hashCacheKey } from './hash.ts';
-import { stripSvgScripts } from './svg.ts';
+import { inheritTypstTextColor, stripSvgScripts } from './svg.ts';
 
 export interface TypstRenderRequest extends TypstResolvedRendererOptions {
 	source: string;
@@ -65,7 +65,7 @@ export async function renderTypstSvg(options: TypstRenderRequest): Promise<strin
 	}
 
 	const rawSvg = await rawSvgPromise;
-	const safeSvg = stripSvgScripts(rawSvg);
+	const safeSvg = inheritTypstTextColor(stripSvgScripts(rawSvg));
 
 	return options.sanitize ? options.sanitize(safeSvg) : safeSvg;
 }
