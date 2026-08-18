@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdtemp, mkdir, rm, symlink, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import http from 'node:http';
 import net from 'node:net';
 import path from 'node:path';
@@ -145,3 +145,10 @@ test(
 		}
 	}
 );
+
+test('published environment switch stays bundler-portable', async () => {
+	const fontsModule = await readFile(path.join(repoRoot, 'dist', 'fonts.js'), 'utf8');
+
+	assert.doesNotMatch(fontsModule, /import\.meta\.env/);
+	assert.match(fontsModule, /from ['"]esm-env['"]/);
+});

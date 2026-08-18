@@ -17,6 +17,9 @@ importers:
       '@myriaddreamin/typst.ts':
         specifier: 0.7.0-rc2
         version: 0.7.0-rc2(@myriaddreamin/typst-ts-renderer@0.7.0-rc2)(@myriaddreamin/typst-ts-web-compiler@0.7.0-rc2)
+      esm-env:
+        specifier: ^1.2.2
+        version: 1.2.2
     devDependencies:
       '@eslint/compat':
         specifier: ^2.0.4
