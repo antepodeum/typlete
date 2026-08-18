@@ -1,6 +1,7 @@
 import type { TypstInputMode, TypstMode, TypstResolvedRendererOptions } from './config.ts';
 import { createTypstDocument } from './document.ts';
 import { hashCacheKey } from './hash.ts';
+import { getLocalTypstFontAssets } from './fonts.ts';
 import { inheritTypstTextColor, stripSvgScripts } from './svg.ts';
 
 export interface TypstRenderRequest extends TypstResolvedRendererOptions {
@@ -17,12 +18,15 @@ export interface TypstRenderResult {
 
 interface TypstApi {
 	svg(input: { mainContent: string }): Promise<string>;
-	setCompilerInitOptions?: (options: { getModule: () => string }) => void;
-	setRendererInitOptions?: (options: { getModule: () => string }) => void;
+	setCompilerInitOptions?: (options: {
+		getModule?: () => string;
+		beforeBuild?: unknown[];
+	}) => void;
+	setRendererInitOptions?: (options: { getModule?: () => string }) => void;
 }
 
 let typstPromise: Promise<TypstApi> | null = null;
-let browserWasmConfigured = false;
+let runtimeConfigured = false;
 
 const svgCache = new Map<string, Promise<string>>();
 const MAX_CACHE_SIZE = 300;
@@ -244,24 +248,38 @@ async function fetchViaNodeHttp(
 
 async function getTypst(): Promise<TypstApi> {
 	if (!typstPromise) {
-		typstPromise = import('@myriaddreamin/typst.ts').then(({ $typst }) => $typst as TypstApi);
+		typstPromise = configureTypstRuntime();
 	}
 
-	const typst = await typstPromise;
+	return typstPromise;
+}
 
-	if (typeof window !== 'undefined' && !browserWasmConfigured) {
+async function configureTypstRuntime(): Promise<TypstApi> {
+	const [{ $typst, loadFonts }, localFonts] = await Promise.all([
+		import('@myriaddreamin/typst.ts'),
+		getLocalTypstFontAssets()
+	]);
+	const typst = $typst as TypstApi;
+
+	if (runtimeConfigured) {
+		return typst;
+	}
+
+	const compilerOptions: { getModule?: () => string; beforeBuild: unknown[] } = {
+		beforeBuild: [loadFonts([...localFonts], { assets: false })]
+	};
+
+	if (typeof window !== 'undefined') {
 		const { TYPST_COMPILER_ASSET, TYPST_RENDERER_ASSET } = await import('./wasm.ts');
 
-		typst.setCompilerInitOptions?.({
-			getModule: () => TYPST_COMPILER_ASSET
-		});
-
+		compilerOptions.getModule = () => TYPST_COMPILER_ASSET;
 		typst.setRendererInitOptions?.({
 			getModule: () => TYPST_RENDERER_ASSET
 		});
-
-		browserWasmConfigured = true;
 	}
+
+	typst.setCompilerInitOptions?.(compilerOptions);
+	runtimeConfigured = true;
 
 	return typst;
 }

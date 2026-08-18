@@ -111,11 +111,13 @@ class?: string;
 
 `Typst` also accepts `mode`. `TypstInline` and `TypstBlock` set `mode` automatically.
 
-## SSR and browser WASM
+## SSR and local runtime assets
 
 During SSR/build, Typlete renders SVG on the server. After hydration, the browser keeps the server-rendered SVG and loads the Typst WASM runtime only when the formula has to be rendered again on the client.
 
-The browser compiler and renderer WASM files are imported as Vite assets. Consumers do not need to copy WASM files manually.
+Typlete ships the compiler/renderer WASM dependencies and the default Typst `text` font set with the package. Browser builds emit the fonts and WASM as application-local Vite assets; SSR embeds the font data in the server bundle. Normal formula rendering therefore does not fetch fonts from `cdn.jsdelivr.net` or require consumers to copy runtime assets manually.
+
+Raw Typst that explicitly imports external Typst packages can still perform network access according to the underlying Typst package registry. That is separate from Typlete's own runtime assets.
 
 ## Error behavior
 
