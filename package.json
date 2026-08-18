@@ -1,6 +1,6 @@
 {
 	"name": "typlete",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
@@ -93,5 +93,6 @@
 		"jsdom": {
 			"optional": true
 		}
-	}
+	},
+	"license": "Apache-2.0"
 }
