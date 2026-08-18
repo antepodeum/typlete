@@ -26,7 +26,7 @@ export function createTypstDocument(options: TypstDocumentRequest): string {
 	const body =
 		normalizedInputMode === 'raw' ? options.source : createMathBody(options.source, options.mode);
 
-	return [setup.join('\n'), options.preamble, body]
+	return [setup.join('\n'), options.preamble ?? '', body]
 		.filter((part) => part.trim().length > 0)
 		.join('\n\n');
 }

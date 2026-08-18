@@ -40,7 +40,7 @@ describe('Typst math source escaping', () => {
 			inputMode: 'math'
 		});
 
-		assert.match(document, /x\\\$ \\\#image\("evil\.svg"\) \\\$y/);
+		assert.match(document, /x\\\$ \\#image\("evil\.svg"\) \\\$y/);
 	});
 
 	it('does not double-escape already escaped math delimiters', () => {

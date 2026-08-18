@@ -57,8 +57,7 @@ describe('CSS text color inheritance', () => {
 	});
 
 	it('preserves explicit colors', () => {
-		const svg =
-			'<svg><g class="typst-text"><use fill="#000000"/><use fill="#ff0000"/></g></svg>';
+		const svg = '<svg><g class="typst-text"><use fill="#000000"/><use fill="#ff0000"/></g></svg>';
 
 		assert.equal(inheritTypstTextColor(svg), svg);
 	});

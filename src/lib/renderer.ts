@@ -18,10 +18,7 @@ export interface TypstRenderResult {
 
 interface TypstApi {
 	svg(input: { mainContent: string }): Promise<string>;
-	setCompilerInitOptions?: (options: {
-		getModule?: () => string;
-		beforeBuild?: unknown[];
-	}) => void;
+	setCompilerInitOptions?: (options: { getModule?: () => string; beforeBuild?: unknown[] }) => void;
 	setRendererInitOptions?: (options: { getModule?: () => string }) => void;
 }
 
@@ -94,7 +91,7 @@ export async function renderTypstSvgResult(
 
 		return {
 			svg: '',
-			error: ssrFailed ? '' : message,
+			error: message,
 			ssrFailed
 		};
 	}
