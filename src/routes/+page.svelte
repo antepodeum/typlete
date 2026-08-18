@@ -94,7 +94,7 @@
 		<div class="card-heading">
 			<h2>CSS color inheritance</h2>
 			<p class="color-sample">
-				The formula <TypstInline source="E = m c^2" {textSize} /> inherits this sentence's
+				The formula <TypstInline source="a / b + sqrt(x)" {textSize} /> inherits this sentence's
 				<code>color</code> automatically.
 			</p>
 			<p>

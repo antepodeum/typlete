@@ -21,7 +21,7 @@ export function stripSvgScripts(svg: string): string {
 		.replace(JAVASCRIPT_HREF_PATTERN, '');
 }
 
-export function inheritTypstTextColor(svg: string): string {
+export function inheritTypstTextColor(svg: string, includeMathShapes = false): string {
 	let typstTextDepth = 0;
 
 	return svg.replace(SVG_TAG_PATTERN, (tag) => {
@@ -34,7 +34,12 @@ export function inheritTypstTextColor(svg: string): string {
 
 		const isTypstTextRoot = isTypstTextGroup(tag);
 		const insideTypstText = typstTextDepth > 0 || isTypstTextRoot;
-		const rewritten = insideTypstText ? replaceInheritedTextPaint(tag) : tag;
+		// Typst emits structural math rules (fraction/radical/overline/underline bars)
+		// as standalone `typst-shape` paths rather than descendants of `typst-text`.
+		// Only math input opts into rewriting those shapes so raw/markup drawings keep
+		// their explicit paint unchanged.
+		const isMathShape = includeMathShapes && isTypstShape(tag);
+		const rewritten = insideTypstText || isMathShape ? replaceInheritedTextPaint(tag) : tag;
 
 		if (insideTypstText && !/\/\s*>$/.test(tag)) {
 			typstTextDepth += 1;
@@ -49,6 +54,11 @@ function isTypstTextGroup(tag: string): boolean {
 
 	const className = tag.match(SVG_CLASS_PATTERN)?.[2];
 	return className?.split(/\s+/).includes('typst-text') ?? false;
+}
+
+function isTypstShape(tag: string): boolean {
+	const className = tag.match(SVG_CLASS_PATTERN)?.[2];
+	return className?.split(/\s+/).includes('typst-shape') ?? false;
 }
 
 function replaceInheritedTextPaint(tag: string): string {

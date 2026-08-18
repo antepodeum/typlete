@@ -59,6 +59,8 @@ The implicit foreground of inline SVG rendered by Typlete inherits the surroundi
 
 This also follows normal CSS state changes such as `:hover`, disabled states, theme classes, and inherited custom properties. No formula-specific color prop is required.
 
+Math construction strokes inherit the same color too, including fraction bars, radical bars, overlines, and underlines.
+
 Explicit Typst text colors still take precedence and are preserved in the generated SVG:
 
 ```svelte

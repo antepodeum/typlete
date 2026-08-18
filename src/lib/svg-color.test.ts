@@ -68,6 +68,21 @@ describe('CSS text color inheritance', () => {
 		assert.equal(inheritTypstTextColor(svg), svg);
 	});
 
+	it('rewrites inherited paint on Typst math shapes when requested', () => {
+		const svg = `<svg><path class="typst-shape" fill="none" stroke="${TYPLETE_INHERITED_TEXT_COLOR}"/></svg>`;
+
+		assert.equal(
+			inheritTypstTextColor(svg, true),
+			'<svg><path class="typst-shape" fill="none" stroke="currentColor"/></svg>'
+		);
+	});
+
+	it('does not rewrite arbitrary shapes even when math-shape rewriting is enabled', () => {
+		const svg = `<svg><path class="custom-shape" stroke="${TYPLETE_INHERITED_TEXT_COLOR}"/></svg>`;
+
+		assert.equal(inheritTypstTextColor(svg, true), svg);
+	});
+
 	it('rewrites nested glyph elements inside Typst text groups only', () => {
 		const svg = `<svg><g class="typst-text"><g><use fill="${TYPLETE_INHERITED_TEXT_COLOR}"/></g></g><use fill="${TYPLETE_INHERITED_TEXT_COLOR}"/></svg>`;
 

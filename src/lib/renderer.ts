@@ -72,7 +72,7 @@ export async function renderTypstSvg(options: TypstRenderRequest): Promise<strin
 	}
 
 	const rawSvg = await rawSvgPromise;
-	const safeSvg = inheritTypstTextColor(stripSvgScripts(rawSvg));
+	const safeSvg = inheritTypstTextColor(stripSvgScripts(rawSvg), options.inputMode === 'math');
 
 	return options.sanitize ? options.sanitize(safeSvg) : safeSvg;
 }

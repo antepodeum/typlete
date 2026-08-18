@@ -106,6 +106,7 @@ test(
 				path.join(fixture, 'src', 'routes', '+page.svelte'),
 				`<script>import { TypstInline } from 'typlete';</script>\n` +
 					`<p id="valid"><TypstInline source="integral_0^1 x^2 dif x" throwOnError={true} /></p>\n` +
+					`<p id="fraction"><TypstInline source="a / b" throwOnError={true} /></p>\n` +
 					`<p id="invalid"><TypstInline inputMode="raw" source="#let =" errorMode="badge" /></p>\n`
 			);
 			await writeFile(
@@ -133,6 +134,8 @@ test(
 			assert.equal(response.status, 200, previewLog);
 			assert.match(response.body, /<svg\b[^>]*class="typst-doc"/);
 			assert.doesNotMatch(response.body, /id="valid"[\s\S]*?typst-placeholder/);
+			assert.match(response.body, /stroke="currentColor"/);
+			assert.doesNotMatch(response.body, /#01fe02/i);
 			assert.match(response.body, /id="invalid"[\s\S]*?data-error=/);
 			assert.match(response.body, /typst-error-badge/);
 			assert.doesNotMatch(response.body, /cdn\.jsdelivr\.net/i);
