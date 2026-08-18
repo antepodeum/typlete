@@ -1,3 +1,4 @@
+import { BROWSER } from 'esm-env';
 import type { TypstInputMode, TypstMode, TypstResolvedRendererOptions } from './config.ts';
 import { createTypstDocument } from './document.ts';
 import { hashCacheKey } from './hash.ts';
@@ -16,10 +17,15 @@ export interface TypstRenderResult {
 	ssrFailed: boolean;
 }
 
+type TypstWasmModule = string | Uint8Array<ArrayBufferLike>;
+
 interface TypstApi {
 	svg(input: { mainContent: string }): Promise<string>;
-	setCompilerInitOptions?: (options: { getModule?: () => string; beforeBuild?: unknown[] }) => void;
-	setRendererInitOptions?: (options: { getModule?: () => string }) => void;
+	setCompilerInitOptions?: (options: {
+		getModule?: () => TypstWasmModule;
+		beforeBuild?: unknown[];
+	}) => void;
+	setRendererInitOptions?: (options: { getModule?: () => TypstWasmModule }) => void;
 }
 
 let typstPromise: Promise<TypstApi> | null = null;
@@ -262,18 +268,23 @@ async function configureTypstRuntime(): Promise<TypstApi> {
 		return typst;
 	}
 
-	const compilerOptions: { getModule?: () => string; beforeBuild: unknown[] } = {
+	const wasmAssets = BROWSER
+		? await import('./wasm.ts').then(({ TYPST_COMPILER_ASSET, TYPST_RENDERER_ASSET }) => ({
+				compiler: TYPST_COMPILER_ASSET as TypstWasmModule,
+				renderer: TYPST_RENDERER_ASSET as TypstWasmModule
+			}))
+		: await import('./wasm.node.ts').then(({ getServerTypstWasmAssets }) =>
+				getServerTypstWasmAssets()
+			);
+
+	const compilerOptions: { getModule: () => TypstWasmModule; beforeBuild: unknown[] } = {
+		getModule: () => wasmAssets.compiler,
 		beforeBuild: [loadFonts([...localFonts], { assets: false })]
 	};
 
-	if (typeof window !== 'undefined') {
-		const { TYPST_COMPILER_ASSET, TYPST_RENDERER_ASSET } = await import('./wasm.ts');
-
-		compilerOptions.getModule = () => TYPST_COMPILER_ASSET;
-		typst.setRendererInitOptions?.({
-			getModule: () => TYPST_RENDERER_ASSET
-		});
-	}
+	typst.setRendererInitOptions?.({
+		getModule: () => wasmAssets.renderer
+	});
 
 	typst.setCompilerInitOptions?.(compilerOptions);
 	runtimeConfigured = true;

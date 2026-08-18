@@ -13,7 +13,7 @@
 		"format": "prettier --write .",
 		"test": "npm run test:unit && npm run test:ssr",
 		"test:unit": "node --experimental-strip-types --test src/lib/markdown.test.ts src/lib/math-security.test.ts src/lib/svg-color.test.ts",
-		"test:ssr": "svelte-kit sync && svelte-package && node --test tests/consumer-ssr.test.mjs"
+		"test:ssr": "svelte-kit sync && svelte-package && node --test tests/server-wasm-assets.test.mjs tests/consumer-ssr.test.mjs"
 	},
 	"files": [
 		"dist",
@@ -47,7 +47,10 @@
 		"./server/dompurify": {
 			"types": "./dist/server/dompurify.d.ts",
 			"default": "./dist/server/dompurify.js"
-		}
+		},
+		"./assets/wasm/compiler": "./dist/assets/wasm/typst_ts_web_compiler_bg.wasm",
+		"./assets/wasm/renderer": "./dist/assets/wasm/typst_ts_renderer_bg.wasm",
+		"./assets/fonts/*": "./dist/assets/fonts/*"
 	},
 	"dependencies": {
 		"@myriaddreamin/typst-ts-renderer": "0.7.0-rc2",
